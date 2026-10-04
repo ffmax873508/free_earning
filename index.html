@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Earning Zone - Adsgram Mini App</title>
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b0b0e;
+            --card-bg: rgba(20, 20, 25, 0.9);
+            --neon-red: #ff3333;
+            --neon-orange: #ff7700;
+            --neon-yellow: #ffcc00;
+            --text-color: #ffffff;
+            --text-muted: #aaaaaa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(255, 119, 0, 0.25);
+            border: 2px solid rgba(255, 119, 0, 0.4);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            padding: 20px;
+            height: 100%;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Top Profile Header */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255,51,51,0.2), rgba(255,204,0,0.2));
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 204, 0, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .user-info h4 {
+            font-size: 15px;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
+        }
+
+        .user-balance-badge {
+            background: rgba(0,0,0,0.6);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--neon-orange);
+            border: 1px solid var(--neon-orange);
+        }
+
+        /* Welcome Screen */
+        .welcome-box {
+            text-align: center;
+            padding: 40px 10px;
+        }
+
+        .welcome-box h1 {
+            font-size: 30px;
+            color: var(--neon-orange);
+            text-shadow: 0 0 10px var(--neon-red);
+            margin-bottom: 15px;
+        }
+
+        .welcome-box p {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--neon-yellow);
+        }
+
+        /* Buttons & Neon Glow */
+        .neon-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--neon-red), var(--neon-orange), var(--neon-yellow));
+            background-size: 200% auto;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 119, 0, 0.5);
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .neon-btn:hover {
+            background-position: right center;
+            box-shadow: 0 0 25px var(--neon-yellow);
+        }
+
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(145deg, #181515, #221a11);
+            border: 1px solid var(--neon-orange);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 10px rgba(255,119,0,0.2);
+        }
+
+        .balance-card span {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-amount {
+            font-size: 30px;
+            font-weight: bold;
+            color: var(--neon-yellow);
+            margin-top: 5px;
+            text-shadow: 0 0 8px rgba(255, 204, 0, 0.4);
+        }
+
+        /* Sections & Cards */
+        .section-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255, 119, 0, 0.25);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            border-color: var(--neon-yellow);
+            outline: none;
+        }
+
+        /* Action Rows */
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-info {
+            font-size: 14px;
+            color: var(--text-color);
+            line-height: 1.4;
+        }
+
+        .action-info span {
+            color: var(--neon-yellow);
+            font-weight: bold;
+        }
+
+        .small-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+            background: linear-gradient(45deg, var(--neon-orange), var(--neon-yellow));
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255,204,0,0.4);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: var(--neon-yellow);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* Task Screen Specific Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255, 119, 0, 0.3);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-box span {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .stat-box strong {
+            font-size: 16px;
+            color: var(--neon-yellow);
+            margin-top: 4px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- ================= 1. WELCOME SCREEN ================= -->
+        <div id="welcomeScreen" class="screen active">
+            <div class="welcome-box">
+                <h1>Welcome</h1>
+                <p id="welcomeNoticeText">ফ্রি আর্নিং জোনে আপনাকে স্বাগতম! ঘরে বসে প্রতিদিন সহজে ইনকাম করুন।</p>
+                <button class="neon-btn" onclick="goToHome()">Get Started</button>
+            </div>
+        </div>
+
+        <!-- ================= 2. HOME SCREEN ================= -->
+        <div id="homeScreen" class="screen">
+            <!-- Top Profile Header -->
+            <div class="top-header">
+                <div class="user-info">
+                    <h4 id="userNameDisplay">Loading...</h4>
+                </div>
+                <div class="user-balance-badge" id="headerBalance">৳ 0.00 BDT</div>
+            </div>
+
+            <!-- Total Balance Card -->
+            <div class="balance-card">
+                <span>Total Balance</span>
+                <div class="balance-amount" id="mainBalance">BDT 0.00</div>
+            </div>
+
+            <!-- Action Buttons for Withdraw & Referral -->
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="neon-btn" style="padding: 10px; font-size: 14px;" onclick="goToWithdrawScreen()">💳 Withdraw</button>
+                <button class="neon-btn" style="padding: 10px; font-size: 14px; background: linear-gradient(45deg, #0088cc, #3399ff);" onclick="goToReferralScreen()">👥 Invite Friends</button>
+            </div>
+
+            <!-- Daily Bonus Section -->
+            <div class="section-card">
+                <div class="action-row">
+                    <div class="action-info">
+                        🎁 Daily Bonus <br><span id="dailyBonusText">৳ 5.00 BDT Free</span>
+                    </div>
+                    <button class="small-btn" onclick="claimDailyBonus()">Claim Now</button>
+                </div>
+            </div>
+
+            <!-- Telegram Channel Section -->
+            <div class="section-card" style="background: rgba(0, 136, 204, 0.1); border-color: #0088cc;">
+                <div class="action-row">
+                    <div class="action-info" style="color: #3399ff;">
+                        📢 Official Telegram Channel <br><span>Join & Stay Updated</span>
+                    </div>
+                    <button class="small-btn" style="background: #0088cc; color: white;" onclick="window.open('https://t.me/your_channel_link', '_blank')">Join Now</button>
+                </div>
+            </div>
+
+            <!-- Start Earning Button -->
+            <button class="neon-btn" style="margin-top: 10px;" onclick="goToTaskScreen()">🚀 Start Earning</button>
+        </div>
+
+        <!-- ================= 3. WITHDRAW SCREEN ================= -->
+        <div id="withdrawScreen" class="screen">
+            <a href="#" class="back-link" onclick="goToHome()">⬅️ Back to Home</a>
+            <div class="section-card" style="margin-top: 10px;">
+                <h3 style="color: var(--neon-orange); margin-bottom: 12px; font-size: 16px;">💳 Withdraw Funds</h3>
+                <div class="form-group">
+                    <label>Select Payment Method</label>
+                    <select id="withdrawMethod" class="form-control">
+                        <option value="bkash">bKash</option>
+                        <option value="nagad">Nagad</option>
+                        <option value="recharge">Mobile Recharge</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Your Account Number</label>
+                    <input type="text" id="withdrawNumber" class="form-control" placeholder="017xxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label>Amount (Minimum 20 BDT)</label>
+                    <input type="number" id="withdrawAmount" class="form-control" placeholder="Minimum 20 BDT">
+                </div>
+                <button class="neon-btn" style="margin-top: 5px; font-size: 14px;" onclick="requestWithdraw()">Submit Request</button>
+            </div>
+        </div>
+
+        <!-- ================= 4. REFERRAL SCREEN ================= -->
+        <div id="referralScreen" class="screen">
+            <a href="#" class="back-link" onclick="goToHome()">⬅️ Back to Home</a>
+            <div class="section-card" style="text-align: center; padding: 20px;">
+                <h3 style="color: var(--neon-yellow); margin-bottom: 10px;">👥 Invite Your Friends</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Share your referral link with friends and earn bonus rewards instantly!</p>
+
+                <div class="form-group">
+                    <input type="text" id="referralLinkInput" class="form-control" value="https://t.me/your_bot?start=ref123" readonly style="text-align: center;">
+                </div>
+                <button class="small-btn" style="width: 100%; padding: 10px; margin-top: 5px;" onclick="copyReferralLink()">Copy Referral Link</button>
+            </div>
+        </div>
+
+        <!-- ================= 5. TASK / WATCH AD SCREEN ================= -->
+        <div id="taskScreen" class="screen">
+            <a href="#" class="back-link" onclick="goToHome()">⬅️ Back to Home</a>
+
+            <div class="top-header" style="margin-bottom: 15px;">
+                <div class="user-info">
+                    <h4 id="taskUserNameDisplay">Loading...</h4>
+                </div>
+                <div class="user-balance-badge" id="taskHeaderBalance">৳ 0.00 BDT</div>
+            </div>
+
+            <!-- Stats Grid (Remaining vs Completed) -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span>Remaining Ads</span>
+                    <strong id="remainingLimit">10</strong>
+                </div>
+                <div class="stat-box">
+                    <span>Completed Ads</span>
+                    <strong id="completedAds">0</strong>
+                </div>
+            </div>
+
+            <div class="balance-card" style="padding: 15px; margin-bottom: 20px;">
+                <span style="font-size: 15px; color: var(--neon-orange); font-weight: bold;">Watch Ad & Earn</span>
+                <div style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">
+                    Reward Per Ad: <span id="rewardPerAd" style="color: var(--neon-yellow);">৳ 0.50</span>
+                </div>
+            </div>
+
+            <button class="neon-btn" style="font-size: 18px; padding: 16px;" onclick="watchAdsgramAd()">📺 Watch Ad & Earn</button>
+        </div>
+
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let userData = {
+            telegram_id: tg.initDataUnsafe?.user?.id || "123456789",
+            first_name: tg.initDataUnsafe?.user?.first_name || "Guest User",
+            username: tg.initDataUnsafe?.user?.username || "guest"
+        };
+
+        window.onload = function() {
+            document.getElementById('userNameDisplay').innerText = userData.first_name;
+            document.getElementById('taskUserNameDisplay').innerText = userData.first_name;
+
+            // নতুন ডোমেন affan.top এর সাথে কানেকশন পয়েন্ট
+            fetchUserDataFromBackend();
+        };
+
+        function goToHome() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('homeScreen').classList.add('active');
+        }
+
+        function goToWithdrawScreen() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('withdrawScreen').classList.add('active');
+        }
+
+        function goToReferralScreen() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('referralScreen').classList.add('active');
+        }
+
+        function goToTaskScreen() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('taskScreen').classList.add('active');
+        }
+
+        function fetchUserDataFromBackend() {
+            // Updated Domain: affan.top
+            fetch('https://affan.top/get_data.php?telegram_id=' + userData.telegram_id)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        document.getElementById('welcomeNoticeText').innerText = data.notice || "ফ্রি আর্নিং জোনে আপনাকে স্বাগতম! ঘরে বসে প্রতিদিন সহজে ইনকাম করুন।";
+                        document.getElementById('mainBalance').innerText = "BDT " + data.balance;
+                        document.getElementById('headerBalance').innerText = "৳ " + data.balance + " BDT";
+                        document.getElementById('taskHeaderBalance').innerText = "৳ " + data.balance + " BDT";
+                        document.getElementById('dailyBonusText').innerText = "৳ " + data.daily_bonus + " BDT Free";
+                        document.getElementById('rewardPerAd').innerText = "৳ " + data.ad_reward;
+                        document.getElementById('remainingLimit').innerText = data.remaining_limit;
+                        document.getElementById('completedAds').innerText = data.completed_ads;
+                        if(data.referral_link) {
+                            document.getElementById('referralLinkInput').value = data.referral_link;
+                        }
+                    }
+                })
+                .catch(err => {
+                    // ফলব্যাক ডেমো ডাটা
+                    document.getElementById('welcomeNoticeText').innerText = "ফ্রি আর্নিং জোনে আপনাকে স্বাগতম! ঘরে বসে প্রতিদিন সহজে ইনকাম করুন।";
+                    document.getElementById('mainBalance').innerText = "BDT 0.00";
+                });
+        }
+
+        function claimDailyBonus() {
+            alert('Daily bonus claimed successfully!');
+        }
+
+        function requestWithdraw() {
+            const amount = document.getElementById('withdrawAmount').value;
+            const number = document.getElementById('withdrawNumber').value;
+
+            if(!number || !amount) {
+                alert('Please fill up all fields correctly.');
+                return;
+            }
+            if(amount < 20) {
+                alert('Minimum withdraw amount is 20 BDT!');
+                return;
+            }
+            alert('Withdraw request submitted successfully!');
+        }
+
+        function copyReferralLink() {
+            const copyText = document.getElementById("referralLinkInput");
+            copyText.select();
+            document.execCommand("copy");
+            alert('Referral link copied to clipboard!');
+        }
+
+        function watchAdsgramAd() {
+            alert('Adsgram Ad is loading...');
+        }
+    </script>
+</body>
+</html>
